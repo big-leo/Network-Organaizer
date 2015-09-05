@@ -1,14 +1,16 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
+apply plugin: 'war'
 
 mainClassName = 'ua.at.programmers.netorg.Main'
 version = '0.1'
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'Network-Organizer',
-                   'Implementation-Version': version
+        attributes  'Implementation-Title': 'Network-Organizer',
+                    'Implementation-Version': version,
+                    'Main-Class': 'ua.at.programmers.netorg.Main'
     }
 }
 

@@ -30,44 +30,34 @@ public class Main {
     }
 
     public void scanUrl(String sUrl, int i) throws IOException {
-        SocketTU sock1 = new SocketTU(sUrl, i);
-        sock1.open();
-        sock1.close();
+        SocketTU.scan(sUrl, i);
     }
 
     public void scanUrl(String sUrl) throws IOException {
-        for (int i = 1; i < 1000; i++) {
-            scanUrl(sUrl, i);
-        }
+        SocketTU.scan(sUrl);
     }
 
     public static void main(String[] args) throws IOException {
         Main main1 = new Main();
         if (args.length == 0) {
-            SwingUtilities.invokeLater(new Runnable() {
-                    
-                    @Override
-                    public void run() {
-                        Gui gui = new Gui();
-                    }
-                });
+            SwingUtilities.invokeLater(new Gui());
         }
         else if (args.length == 1) {
             if (args[0].equals("-h")) {
                 System.out.println("for run GUI run without parameters");
                 System.out.println("-h for print help");
                 System.out.println("-url http://i.ua for print page from url");
-                System.out.println("192.168.0.1 22 for scan open port");
+                System.out.println("192.168.0.1 22 (or i.ua 80) for scan open port");
             }
             else {
-                main1.scanUrl(args[0]);
+                SocketTU.scan(args[0]);
             }
         }
         else if (args.length == 2) {
             if (args[0].equals("-url"))
                 main1.getUrl(args[1]);
             else {
-                main1.scanUrl(args[0], Integer.parseInt(args[1]));
+                SocketTU.scan(args[0], Integer.parseInt(args[1]));
             }
         }
     }

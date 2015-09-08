@@ -3,6 +3,8 @@ package ua.at.programmers.netorg.logic;
 import java.io.*;
 import java.net.*;
 
+import javax.swing.JTextArea;
+
 public class SocketTU {
     private static int nextId = 0;
     private int id;
@@ -13,6 +15,7 @@ public class SocketTU {
     private String sUrl;
     private int port;
     private static boolean withEcho = true;
+    private static JTextArea txtLog;
 
     public static void scan(String sUrl, int port) throws IOException {
         SocketTU sock = new SocketTU( sUrl, port );
@@ -30,12 +33,16 @@ public class SocketTU {
         SocketTU.withEcho = withEcho;
     }
 
+    public static void setLog(JTextArea txtLog) {
+        SocketTU.txtLog = txtLog;
+    }
+
     private SocketTU(String sUrl, int port) {
         sockaddr = new InetSocketAddress(sUrl, port);
         this.sUrl = sUrl;
         this.port = port;
-        
     }
+
     private void open() throws IOException {
         try {
             if (socket != null) 
@@ -48,7 +55,7 @@ public class SocketTU {
                 }
             }
             if (isOpen)
-                System.out.println("open " + sUrl + " " + port );
+                this.msg("open " + sUrl + " " + port );
                 //System.out.println((isOpen) ? "open" : "close");
         } catch (SocketTimeoutException toe) {
             error = "Timeout";
@@ -57,10 +64,11 @@ public class SocketTU {
             error = "port is closing";
         }
         if ((withEcho) && (error != null) && (error.length() != 0)) {
-            System.out.println(error);
+            this.msg(error);
             error = null;
         }
     }
+
     private void close() throws IOException {
         if (socket != null) {
             try { 
@@ -74,8 +82,17 @@ public class SocketTU {
                 error = "port is closing";
             }
             if ((withEcho) && (error != null) && (error.length() != 0))
-                System.out.println(error);
+                this.msg(error);
         }
         //System.out.println((isOpen) ? "open" : "close");
+    }
+    
+    private void msg(String msg) {
+        if (SocketTU.txtLog == null) {
+            System.out.println(msg);
+        }
+        else {
+            SocketTU.txtLog.append(msg + "\n");
+        }
     }
 }

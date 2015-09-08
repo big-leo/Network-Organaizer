@@ -12,22 +12,9 @@ import java.io.*;
 import ua.at.programmers.netorg.gui.Gui;
 import ua.at.programmers.netorg.console.Menu;
 import ua.at.programmers.netorg.logic.SocketTU;
+import ua.at.programmers.netorg.logic.WebScan;
 
 public class Main {
-
-    public void getUrl(String sUrl) throws IOException {
-        URL url = new URL(sUrl);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "Cp1251"));
-
-        String s;
-        while ((s = reader.readLine()) != null) {
-            System.out.println(s);
-        }
-
-        if (reader == null) {
-            reader.close();
-        }
-    }
 
     public void scanUrl(String sUrl, int i) throws IOException {
         SocketTU.scan(sUrl, i);
@@ -54,8 +41,11 @@ public class Main {
             }
         }
         else if (args.length == 2) {
-            if (args[0].equals("-url"))
-                main1.getUrl(args[1]);
+            if (args[0].equals("-url")) {
+                WebScan wscan = new WebScan(args[1]);
+                Thread turl = new Thread(wscan);
+                turl.start();
+            }
             else {
                 SocketTU.scan(args[0], Integer.parseInt(args[1]));
             }

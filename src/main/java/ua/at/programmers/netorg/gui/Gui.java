@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 
 import java.awt.Insets;
 import java.awt.Panel;
@@ -23,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 import ua.at.programmers.netorg.logic.SocketTU;
+import ua.at.programmers.netorg.logic.WebScan;
 /**
  *
  * @author bogdan
@@ -32,15 +34,21 @@ public class Gui extends JFrame implements ActionListener, Runnable {
     private int sizeY = 150;
     private Panel panelMain;
     private Panel panelBorder;
-    private Panel panelCtrl;
+    private Panel panelScan;
+    private Panel panelUrl;
     private Panel panelLog;
+    private JTabbedPane tabPane;
     private JLabel prm1;
     private JLabel prm2;
-    private JTextField txtfldprm1;
-    private JTextField txtfldprm2;
+    private JTextField txtFldPrm1;
+    private JTextField txtFldPrm2;
+    private JButton btnScan;
+    private JLabel labelUrl;
+    private JTextField txtUrl;
+    private JButton btnGetUrl;
+    private JButton btnSaveAs;
     private JTextArea txtLog;
-    private JButton btnscan;
-    
+
     @Override
     public void run() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -50,13 +58,20 @@ public class Gui extends JFrame implements ActionListener, Runnable {
         this.create_gui_items();
         panelMain.setLayout(new FlowLayout());
         panelBorder.setLayout(new GridLayout(0, 2));
-        panelCtrl.setLayout(new GridLayout(0, 2));
-        panelCtrl.add(prm1);
-        panelCtrl.add(txtfldprm1);
-        panelCtrl.add(prm2);
-        panelCtrl.add(txtfldprm2);
-        panelCtrl.add(btnscan);
-        panelBorder.add(panelCtrl);
+        panelScan.setLayout(new GridLayout(0, 2));
+        panelScan.add(prm1);
+        panelScan.add(txtFldPrm1);
+        panelScan.add(prm2);
+        panelScan.add(txtFldPrm2);
+        panelScan.add(btnScan);
+        tabPane.addTab("Scan port", panelScan);
+        panelUrl.setLayout(new GridLayout(0, 2));
+        panelUrl.add(labelUrl);
+        panelUrl.add(txtUrl);
+        panelUrl.add(btnGetUrl);
+        panelUrl.add(btnSaveAs);
+        tabPane.addTab("Url", panelUrl);
+        panelBorder.add(tabPane);
         JScrollPane scrollPaneLog = new JScrollPane(txtLog);
         panelBorder.add(scrollPaneLog);
         panelMain.add(panelBorder);
@@ -69,8 +84,8 @@ public class Gui extends JFrame implements ActionListener, Runnable {
         if ("scan".equals(event.getActionCommand())) {
             String prm1, prm2;
             int intPrm2 = 0;
-            prm1 = txtfldprm1.getText();
-            prm2 = txtfldprm2.getText();
+            prm1 = txtFldPrm1.getText();
+            prm2 = txtFldPrm2.getText();
             try {
                 intPrm2 = Integer.parseInt(prm2);
             } catch (NumberFormatException nfe) {}
@@ -87,21 +102,47 @@ public class Gui extends JFrame implements ActionListener, Runnable {
                 }
             } catch (IOException ioe) {}
         }
+        else if ("geturl".equals(event.getActionCommand())) {
+            String sUrl;
+            sUrl = txtUrl.getText();
+            WebScan wscan = new WebScan(sUrl);
+            wscan.setLog(txtLog);
+            Thread tUrl = new Thread(wscan);
+            tUrl.start();
+        }
+        else if ("saveas".equals(event.getActionCommand())) {
+            String sUrl;
+            sUrl = txtUrl.getText();
+            WebScan wscan = new WebScan(sUrl);
+            wscan.setLog(txtLog);
+            Thread tUrl = new Thread(wscan);
+            tUrl.start();
+        }
     }
 
     private void create_gui_items() {
         panelMain = new Panel();
         panelBorder = new Panel();
-        panelCtrl = new Panel();
+        panelScan = new Panel();
+        panelUrl = new Panel();
+        tabPane = new JTabbedPane();
         prm1 = new JLabel("args[0]");
         prm2 = new JLabel("args[1]");
-        txtfldprm1 = new JTextField(10);
-        txtfldprm2 = new JTextField(10);
+        txtFldPrm1 = new JTextField(10);
+        txtFldPrm2 = new JTextField(10);
+        btnScan = new JButton("scan");
+        btnScan.setActionCommand("scan");
+        btnScan.addActionListener(this);
+        labelUrl = new JLabel("Url");
+        txtUrl = new JTextField(10);
+        btnGetUrl = new JButton("Get url");
+        btnGetUrl.setActionCommand("geturl");
+        btnGetUrl.addActionListener(this);
+        btnSaveAs = new JButton("Save as");
+        btnSaveAs.setActionCommand("saveas");
+        btnSaveAs.addActionListener(this);
         txtLog = new JTextArea(5, 20);
         txtLog.setMargin(new Insets(5, 5, 5, 5));
         txtLog.setEditable(false);
-        btnscan = new JButton("scan");
-        btnscan.setActionCommand("scan");
-        btnscan.addActionListener(this);
     }
 }

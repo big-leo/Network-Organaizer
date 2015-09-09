@@ -43,8 +43,8 @@ public class Main {
         else if (args.length == 2) {
             if (args[0].equals("-url")) {
                 WebScan wscan = new WebScan(args[1]);
-                Thread turl = new Thread(wscan);
-                turl.start();
+                Thread tUrl = new Thread(wscan);
+                tUrl.start();
             }
             else {
                 SocketTU.scan(args[0], Integer.parseInt(args[1]));

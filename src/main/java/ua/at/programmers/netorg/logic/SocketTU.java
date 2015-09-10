@@ -22,7 +22,7 @@ public class SocketTU {
         sock.open();
         sock.close();
     }
-    
+
     public static void scan(String sUrl) throws IOException {
         for (int i = 0; i < 1000; i++) {
             SocketTU.scan(sUrl, i);
@@ -86,7 +86,7 @@ public class SocketTU {
         }
         //System.out.println((isOpen) ? "open" : "close");
     }
-    
+
     private void msg(String msg) {
         if (SocketTU.txtLog == null) {
             System.out.println(msg);

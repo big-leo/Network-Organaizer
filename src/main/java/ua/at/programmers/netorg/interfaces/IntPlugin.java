@@ -2,11 +2,13 @@ package ua.at.programmers.netorg.interfaces;
 
 import java.awt.Panel;
 
-public interface IntPlugin {
+import javax.swing.JTextArea;
 
-    public void setLog(IntLogWriter logWriter);
+public interface IntPlugin {
 
     public String getName();
 
     public Panel getPanel();
+
+    public void setLog(JTextArea txtLog);
 }

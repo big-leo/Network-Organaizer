@@ -35,7 +35,6 @@ public class Gui extends JFrame implements ActionListener, Runnable {
     private Panel panelMain;
     private Panel panelBorder;
     private Panel panelScan;
-    private Panel panelUrl;
     private Panel panelLog;
     private JTabbedPane tabPane;
     private JLabel prm1;
@@ -43,10 +42,6 @@ public class Gui extends JFrame implements ActionListener, Runnable {
     private JTextField txtFldPrm1;
     private JTextField txtFldPrm2;
     private JButton btnScan;
-    private JLabel labelUrl;
-    private JTextField txtUrl;
-    private JButton btnGetUrl;
-    private JButton btnSaveAs;
     private JTextArea txtLog;
 
     @Override
@@ -65,12 +60,11 @@ public class Gui extends JFrame implements ActionListener, Runnable {
         panelScan.add(txtFldPrm2);
         panelScan.add(btnScan);
         tabPane.addTab("Scan port", panelScan);
-        panelUrl.setLayout(new GridLayout(0, 2));
-        panelUrl.add(labelUrl);
-        panelUrl.add(txtUrl);
-        panelUrl.add(btnGetUrl);
-        panelUrl.add(btnSaveAs);
-        tabPane.addTab("Url", panelUrl);
+        WebScan webScan = new WebScan();
+        Thread t = new Thread(webScan);
+        t.start();
+        System.out.println(webScan.getPanel());
+        tabPane.addTab(webScan.getName(), webScan.getPanel());
         panelBorder.add(tabPane);
         JScrollPane scrollPaneLog = new JScrollPane(txtLog);
         panelBorder.add(scrollPaneLog);
@@ -78,7 +72,7 @@ public class Gui extends JFrame implements ActionListener, Runnable {
         this.add(panelMain);
         this.pack();
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent event) {
         if ("scan".equals(event.getActionCommand())) {
@@ -102,29 +96,12 @@ public class Gui extends JFrame implements ActionListener, Runnable {
                 }
             } catch (IOException ioe) {}
         }
-        else if ("geturl".equals(event.getActionCommand())) {
-            String sUrl;
-            sUrl = txtUrl.getText();
-            WebScan wscan = new WebScan(sUrl);
-            wscan.setLog(txtLog);
-            Thread tUrl = new Thread(wscan);
-            tUrl.start();
-        }
-        else if ("saveas".equals(event.getActionCommand())) {
-            String sUrl;
-            sUrl = txtUrl.getText();
-            WebScan wscan = new WebScan(sUrl);
-            wscan.setLog(txtLog);
-            Thread tUrl = new Thread(wscan);
-            tUrl.start();
-        }
     }
 
     private void create_gui_items() {
         panelMain = new Panel();
         panelBorder = new Panel();
         panelScan = new Panel();
-        panelUrl = new Panel();
         tabPane = new JTabbedPane();
         prm1 = new JLabel("args[0]");
         prm2 = new JLabel("args[1]");
@@ -133,14 +110,6 @@ public class Gui extends JFrame implements ActionListener, Runnable {
         btnScan = new JButton("scan");
         btnScan.setActionCommand("scan");
         btnScan.addActionListener(this);
-        labelUrl = new JLabel("Url");
-        txtUrl = new JTextField(10);
-        btnGetUrl = new JButton("Get url");
-        btnGetUrl.setActionCommand("geturl");
-        btnGetUrl.addActionListener(this);
-        btnSaveAs = new JButton("Save as");
-        btnSaveAs.setActionCommand("saveas");
-        btnSaveAs.addActionListener(this);
         txtLog = new JTextArea(5, 20);
         txtLog.setMargin(new Insets(5, 5, 5, 5));
         txtLog.setEditable(false);

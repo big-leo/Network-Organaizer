@@ -17,11 +17,11 @@ import ua.at.programmers.netorg.logic.WebScan;
 public class Main {
 
     public void scanUrl(String sUrl, int i) throws IOException {
-        SocketTU.scan(sUrl, i);
+        //SocketTU.scan(sUrl, i);
     }
 
     public void scanUrl(String sUrl) throws IOException {
-        SocketTU.scan(sUrl);
+        //SocketTU.scan(sUrl);
     }
 
     public static void main(String[] args) throws IOException {
@@ -37,7 +37,7 @@ public class Main {
                 System.out.println("192.168.0.1 22 (or i.ua 80) for scan open port");
             }
             else {
-                SocketTU.scan(args[0]);
+                //SocketTU.scan(args[0]);
             }
         }
         else if (args.length == 2) {
@@ -47,7 +47,7 @@ public class Main {
                 tUrl.start();*/
             }
             else {
-                SocketTU.scan(args[0], Integer.parseInt(args[1]));
+                //SocketTU.scan(args[0], Integer.parseInt(args[1]));
             }
         }
     }

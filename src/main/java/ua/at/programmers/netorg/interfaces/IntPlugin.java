@@ -4,7 +4,7 @@ import java.awt.Panel;
 
 import javax.swing.JTextArea;
 
-public interface IntPlugin {
+public interface IntPlugin extends Runnable {
 
     public String getName();
 

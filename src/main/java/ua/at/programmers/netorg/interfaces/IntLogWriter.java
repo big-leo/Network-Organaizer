@@ -4,5 +4,5 @@ import java.util.ArrayList;
 
 public interface IntLogWriter {
 
-    public void writeLog (ArrayList aList);
+    public void writeLog(ArrayList aList);
 }

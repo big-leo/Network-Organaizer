@@ -5,7 +5,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 //import java.io.Url;
 
-import java.net.*;
+import java.net.URL;
 
 import java.awt.Panel;
 import java.awt.event.ActionListener;
@@ -20,7 +20,7 @@ import javax.swing.JTextArea;
 
 import ua.at.programmers.netorg.interfaces.IntPlugin;
 
-public class WebScan implements ActionListener, Runnable, IntPlugin {
+public class WebScan implements ActionListener, IntPlugin {
     private String name = "Url";
     private String sUrl;
     private Panel panelUrl;

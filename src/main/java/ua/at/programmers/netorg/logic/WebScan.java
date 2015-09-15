@@ -1,9 +1,11 @@
 package ua.at.programmers.netorg.logic;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
-//import java.io.Url;
 
 import java.net.URL;
 
@@ -17,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
+import javax.swing.JFileChooser;
 
 import ua.at.programmers.netorg.interfaces.IntPlugin;
 
@@ -29,6 +32,7 @@ public class WebScan implements ActionListener, IntPlugin {
     private JButton btnGetUrl;
     private JButton btnSaveAs;
     private JTextArea txtLog; //for out log
+    private JFileChooser fileChooser;
 
     @Override
     public void run() {
@@ -53,7 +57,7 @@ public class WebScan implements ActionListener, IntPlugin {
                     this.msg(s);
                 }
 
-                if (reader == null) {
+                if (reader != null) {
                     reader.close();
                 }
             } catch (IOException ioe) {
@@ -62,6 +66,33 @@ public class WebScan implements ActionListener, IntPlugin {
         }
         else if ("saveas".equals(event.getActionCommand())) {
             sUrl = txtUrl.getText();
+            try {
+                if (fileChooser == null) {
+                    fileChooser = new JFileChooser();
+                }
+                int returnVal = fileChooser.showSaveDialog(panelUrl);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    URL url = new URL(sUrl);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "Cp1251"));
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileChooser.getSelectedFile().getPath())));
+
+                    String s;
+                    while ((s = reader.readLine()) != null) {
+                        writer.write(s);
+                        writer.write("\n");
+                    }
+
+                    if (reader != null) {
+                        reader.close();
+                    }
+                    if (writer != null) {
+                        writer.flush();
+                        writer.close();
+                    }
+                }
+            } catch (IOException ioe) {
+                System.out.println(ioe);
+            }
         }
     }
 

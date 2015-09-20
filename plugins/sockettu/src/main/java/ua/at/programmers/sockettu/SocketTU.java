@@ -1,4 +1,4 @@
-package ua.at.programmers.netorg.logic;
+package ua.at.programmers.sockettu;
 
 import java.io.*;
 import java.net.*;

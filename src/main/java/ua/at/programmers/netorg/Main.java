@@ -2,17 +2,10 @@ package ua.at.programmers.netorg;
 
 import javax.swing.SwingUtilities;
 
-import java.net.*;
-import java.io.*;
-
-//import ua.at.programmers.netorg.interfaces.IntGui;
-//import ua.at.programmers.netorg.interfaces.IntMenu;
-//import ua.at.programmers.netorg.interfaces.IntSocketTU;
+import java.io.IOException;
 
 import ua.at.programmers.netorg.gui.Gui;
-import ua.at.programmers.netorg.console.Menu;
-import ua.at.programmers.netorg.logic.SocketTU;
-import ua.at.programmers.netorg.logic.WebScan;
+//import ua.at.programmers.netorg.console.Menu;
 
 public class Main {
 

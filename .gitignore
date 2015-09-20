@@ -17,3 +17,10 @@
 hs_err_pid*
 /.nb-gradle/private/
 /build/
+
+/plugins/sockettu/.gradle/
+/plugins/sockettu/repos/
+/plugins/sockettu/build/
+/plugins/webscan/.gradle/
+/plugins/webscan/repos/
+/plugins/webscan/build/

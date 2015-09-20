@@ -1,4 +1,4 @@
-package ua.at.programmers.netorg.logic;
+package ua.at.programmers.webscan;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

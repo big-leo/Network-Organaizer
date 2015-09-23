@@ -39,6 +39,8 @@ import java.lang.ClassNotFoundException;
 import java.lang.InstantiationException;
 import java.lang.IllegalAccessException;
 
+import groovy.lang.GroovyShell;
+
 //import ua.at.programmers.netorg.logic.SocketTU;
 //import ua.at.programmers.netorg.logic.WebScan;
 
@@ -53,8 +55,11 @@ public class Gui extends JFrame implements ActionListener, Runnable {
     private Panel panelMain;
     private Panel panelBorder;
     private Panel panelLog;
+    private Panel panelScript;
     private JTabbedPane tabPane;
     private JTextArea txtLog;
+    private JTextArea txtScript;
+    private JButton btnRun;
     private List<IntPlugin> pluginsList;
 
     @Override
@@ -65,7 +70,9 @@ public class Gui extends JFrame implements ActionListener, Runnable {
         setVisible(true);
         this.create_gui_items();
         panelMain.setLayout(new FlowLayout());
-        panelBorder.setLayout(new GridLayout(0, 2));
+        panelBorder.setLayout(new GridLayout(3, 0));
+        panelLog.setLayout(new FlowLayout());
+        panelScript.setLayout(new BorderLayout());
         pluginsList = new LinkedList<IntPlugin>();
         loadPlugins("plugins");
         for (IntPlugin plugin : pluginsList) {
@@ -73,12 +80,17 @@ public class Gui extends JFrame implements ActionListener, Runnable {
             Thread t = new Thread(plugin);
             t.start();
             while (plugin.getPanel() == null)
-                System.out.println("null");
+                System.out.println("wait for runing threads with plugins");
             tabPane.addTab(plugin.getName(), plugin.getPanel());
         }
         panelBorder.add(tabPane);
         JScrollPane scrollPaneLog = new JScrollPane(txtLog);
-        panelBorder.add(scrollPaneLog);
+        JScrollPane scrollPanelScript = new JScrollPane(txtScript);
+        panelLog.add(scrollPaneLog);
+        panelScript.add(scrollPanelScript, BorderLayout.CENTER);
+        panelScript.add(btnRun, BorderLayout.PAGE_END);
+        panelBorder.add(panelScript);
+        panelBorder.add(panelLog);
         panelMain.add(panelBorder);
         this.add(panelMain);
         this.pack();
@@ -126,15 +138,32 @@ public class Gui extends JFrame implements ActionListener, Runnable {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        if ("line".equals(event.getActionCommand())) {}
+        if ("RunScript".equals(event.getActionCommand())) {
+            System.out.println("RunScript");
+            String groovyScript = txtScript.getText();
+            GroovyShell groovyShell = new GroovyShell();
+            String result;
+            System.out.println(groovyShell.evaluate(groovyScript));
+            //if (result != null) {
+            //  System.out.println(result);
+            //}
+        }
     }
 
     private void create_gui_items() {
         panelMain = new Panel();
         panelBorder = new Panel();
+        panelLog = new Panel();
+        panelScript = new Panel();
         tabPane = new JTabbedPane();
-        txtLog = new JTextArea(5, 20);
+        txtLog = new JTextArea(10, 30);
         txtLog.setMargin(new Insets(5, 5, 5, 5));
         txtLog.setEditable(false);
+        txtScript = new JTextArea(10, 30);
+        txtScript.setMargin(new Insets(5, 5, 5, 5));
+        txtScript.setEditable(true);
+        btnRun = new JButton("Run Script");
+        btnRun.setActionCommand("RunScript");
+        btnRun.addActionListener(this);
     }
 }

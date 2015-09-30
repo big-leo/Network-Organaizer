@@ -5,6 +5,9 @@
  */
 package ua.at.programmers.netorg.gui;
 
+import ua.at.programmers.netorg.interfaces.IntPlugin;
+import ua.at.programmers.netorg.plugin.PluginLoad;
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -21,35 +24,20 @@ import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-import java.io.IOException;
-import java.io.File;
-import java.io.FileFilter;
-
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.io.OutputStream;
 
-import java.lang.ClassNotFoundException;
-import java.lang.InstantiationException;
-import java.lang.IllegalAccessException;
+import ua.at.programmers.netorg.plugin.PluginLoad;
+import ua.at.programmers.netorg.shell.ShellBuilder;
 
-import groovy.lang.GroovyShell;
-
-//import ua.at.programmers.netorg.logic.SocketTU;
-//import ua.at.programmers.netorg.logic.WebScan;
-
-import ua.at.programmers.netorg.interfaces.IntPlugin;
 /**
  *
  * @author bogdan
  */
 public class Gui extends JFrame implements ActionListener, Runnable {
+
     private int sizeX = 500;
     private int sizeY = 150;
     private Panel panelMain;
@@ -58,6 +46,7 @@ public class Gui extends JFrame implements ActionListener, Runnable {
     private Panel panelScript;
     private JTabbedPane tabPane;
     private JTextArea txtLog;
+    private OutLog outLog;
     private JTextArea txtScript;
     private JButton btnRun;
     private List<IntPlugin> pluginsList;
@@ -73,8 +62,8 @@ public class Gui extends JFrame implements ActionListener, Runnable {
         panelBorder.setLayout(new GridLayout(3, 0));
         panelLog.setLayout(new FlowLayout());
         panelScript.setLayout(new BorderLayout());
-        pluginsList = new LinkedList<IntPlugin>();
-        loadPlugins("plugins");
+        pluginsList = PluginLoad.load(pluginsList);
+        if ( pluginsList != null )
         for (IntPlugin plugin : pluginsList) {
             plugin.setLog(txtLog);
             Thread t = new Thread(plugin);
@@ -96,54 +85,11 @@ public class Gui extends JFrame implements ActionListener, Runnable {
         this.pack();
     }
 
-    private void loadPlugins(String pluginsDir) {
-        File plugDir = new File(pluginsDir);
-        File[] jars = plugDir.listFiles(new FileFilter() {
-                public boolean accept(File file) {
-                    return file.isFile() && file.getName().endsWith(".jar");
-                }
-            });
-        for (int i = 0; i < jars.length; i++) {
-            try {
-                URL url = jars[i].toURI().toURL();
-                //System.out.println(url);
-                URLClassLoader classLoader = new URLClassLoader(new URL[]{url});
-                JarFile jarFile = new JarFile(url.getFile());
-                Enumeration allEntries = jarFile.entries();
-                while (allEntries.hasMoreElements()) {
-                    JarEntry entry = (JarEntry) allEntries.nextElement();
-                    String name = entry.getName();
-                    if ((name.endsWith(".class")) && !(name.endsWith("IntPlugin.class"))) {
-                        //System.out.println(name);
-                        name = name.replace(".class", "");
-                        name = name.replace("/", ".");
-                        Class plugin = classLoader.loadClass(name);
-                        //run construct
-                        pluginsList.add((IntPlugin) plugin.newInstance());
-                    }
-                }
-            } catch(MalformedURLException me) {
-                System.out.println("Malformed URL Exception");
-            } catch(ClassNotFoundException cnfe) {
-                System.out.println("Class not found");
-            } catch(IOException ioe) {
-                System.out.println("IOException");
-            } catch(InstantiationException ie) {
-                System.out.println("Instantiation Exception");
-            } catch(IllegalAccessException iae) {
-                System.out.println("Illegal Access Exception");
-            }
-        }
-    }
-
     @Override
     public void actionPerformed(ActionEvent event) {
         if ("RunScript".equals(event.getActionCommand())) {
-            System.out.println("RunScript");
-            String groovyScript = txtScript.getText();
-            GroovyShell groovyShell = new GroovyShell();
-            String result;
-            System.out.println(groovyShell.evaluate(groovyScript));
+            ShellBuilder shell = new ShellBuilder(outLog);
+            shell.getResult(txtScript.getText());
             //if (result != null) {
             //  System.out.println(result);
             //}
@@ -157,6 +103,7 @@ public class Gui extends JFrame implements ActionListener, Runnable {
         panelScript = new Panel();
         tabPane = new JTabbedPane();
         txtLog = new JTextArea(10, 30);
+        outLog = new OutLog();
         txtLog.setMargin(new Insets(5, 5, 5, 5));
         txtLog.setEditable(false);
         txtScript = new JTextArea(10, 30);
@@ -165,5 +112,13 @@ public class Gui extends JFrame implements ActionListener, Runnable {
         btnRun = new JButton("Run Script");
         btnRun.setActionCommand("RunScript");
         btnRun.addActionListener(this);
+    }
+
+    private class OutLog extends OutputStream {
+
+        @Override
+        public void write(int b) {
+            txtLog.append(String.valueOf((char) b));
+        }
     }
 }

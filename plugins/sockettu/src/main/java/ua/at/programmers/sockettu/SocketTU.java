@@ -125,33 +125,41 @@ public class SocketTU implements ActionListener, IntPlugin {
     public void actionPerformed(ActionEvent event) {
         if ("scan".equals(event.getActionCommand())) {
             String prm1, prm2;
-            int intPrm2 = 0;
             prm1 = txtFldPrm1.getText();
             prm2 = txtFldPrm2.getText();
-            try {
-                intPrm2 = Integer.parseInt(prm2);
-            } catch (NumberFormatException nfe) {}
-            try {
+            this.scan(prm1, prm2);
+        }
+    }
 
-                if (intPrm2 > 0) {
-                    SocketTU.setEcho(true);
+    public void shell_scan(String prm1, String prm2) {
+        this.scan(prm1, prm2);
+    }
+
+    private void scan(String prm1, String prm2) {
+        int intPrm2 = 0;
+        try {
+            intPrm2 = Integer.parseInt(prm2);
+        } catch (NumberFormatException nfe) {}
+        try {
+
+            if (intPrm2 > 0) {
+                SocketTU.setEcho(true);
+                this.sUrl = prm1;
+                this.port = intPrm2;
+                this.open();
+                this.close();
+            }
+            else {
+                SocketTU.setEcho(false);
+                for (int i = 0; i < 1000; i++) {
                     this.sUrl = prm1;
-                    this.port = intPrm2;
+                    this.port = i;
                     this.open();
                     this.close();
                 }
-                else {
-                    SocketTU.setEcho(false);
-                    for (int i = 0; i < 1000; i++) {
-                        this.sUrl = prm1;
-                        this.port = i;
-                        this.open();
-                        this.close();
-                    }
-                }
-            } catch (IOException ioe) {
-                //System.out.println(ioe);
             }
+        } catch (IOException ioe) {
+            //System.out.println(ioe);
         }
     }
 

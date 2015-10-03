@@ -49,7 +49,7 @@ public class Gui extends JFrame implements ActionListener, Runnable {
     private OutLog outLog;
     private JTextArea txtScript;
     private JButton btnRun;
-    private List<IntPlugin> pluginsList;
+    private List<IntPlugin> plugins;
 
     @Override
     public void run() {
@@ -62,9 +62,9 @@ public class Gui extends JFrame implements ActionListener, Runnable {
         panelBorder.setLayout(new GridLayout(3, 0));
         panelLog.setLayout(new FlowLayout());
         panelScript.setLayout(new BorderLayout());
-        pluginsList = PluginLoad.load(pluginsList);
-        if ( pluginsList != null )
-        for (IntPlugin plugin : pluginsList) {
+        plugins = PluginLoad.load(plugins);
+        if ( plugins != null )
+        for (IntPlugin plugin : plugins) {
             plugin.setLog(txtLog);
             Thread t = new Thread(plugin);
             t.start();
@@ -89,6 +89,7 @@ public class Gui extends JFrame implements ActionListener, Runnable {
     public void actionPerformed(ActionEvent event) {
         if ("RunScript".equals(event.getActionCommand())) {
             ShellBuilder shell = new ShellBuilder(outLog);
+            shell.addPlugins(plugins);
             shell.getResult(txtScript.getText());
             //if (result != null) {
             //  System.out.println(result);

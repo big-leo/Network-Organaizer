@@ -47,52 +47,68 @@ public class WebScan implements ActionListener, IntPlugin {
     @Override
     public void actionPerformed(ActionEvent event) {
         if ("geturl".equals(event.getActionCommand())) {
-            sUrl = txtUrl.getText();
-            try {
+            getUrl(txtUrl.getText());
+        }
+        else if ("saveas".equals(event.getActionCommand())) {
+            saveAs(txtUrl.getText());
+        }
+    }
+
+    public void shell_getUrl (String inUrl) {
+        getUrl(inUrl);
+    }
+
+    private void getUrl (String inUrl) {
+        sUrl = inUrl;
+        try {
+            URL url = new URL(sUrl);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "Cp1251"));
+
+            String s;
+            while ((s = reader.readLine()) != null) {
+                this.msg(s);
+            }
+
+            if (reader != null) {
+                reader.close();
+            }
+        } catch (IOException ioe) {
+            System.out.println(ioe);
+        }
+    }
+
+    public void shell_saveAs (String inUrl) {
+        saveAs(inUrl);
+    }
+
+    private void saveAs (String inUrl) {
+        sUrl = inUrl;
+        try {
+            if (fileChooser == null) {
+                fileChooser = new JFileChooser();
+            }
+            int returnVal = fileChooser.showSaveDialog(panelUrl);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
                 URL url = new URL(sUrl);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "Cp1251"));
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileChooser.getSelectedFile().getPath())));
 
                 String s;
                 while ((s = reader.readLine()) != null) {
-                    this.msg(s);
+                    writer.write(s);
+                    writer.write("\n");
                 }
 
                 if (reader != null) {
                     reader.close();
                 }
-            } catch (IOException ioe) {
-                System.out.println(ioe);
-            }
-        }
-        else if ("saveas".equals(event.getActionCommand())) {
-            sUrl = txtUrl.getText();
-            try {
-                if (fileChooser == null) {
-                    fileChooser = new JFileChooser();
+                if (writer != null) {
+                    writer.flush();
+                    writer.close();
                 }
-                int returnVal = fileChooser.showSaveDialog(panelUrl);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    URL url = new URL(sUrl);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "Cp1251"));
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileChooser.getSelectedFile().getPath())));
-
-                    String s;
-                    while ((s = reader.readLine()) != null) {
-                        writer.write(s);
-                        writer.write("\n");
-                    }
-
-                    if (reader != null) {
-                        reader.close();
-                    }
-                    if (writer != null) {
-                        writer.flush();
-                        writer.close();
-                    }
-                }
-            } catch (IOException ioe) {
-                System.out.println(ioe);
             }
+        } catch (IOException ioe) {
+            System.out.println(ioe);
         }
     }
 

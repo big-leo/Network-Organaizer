@@ -41,9 +41,11 @@ public class PluginLoad {
                 while (allEntries.hasMoreElements()) {
                     JarEntry entry = (JarEntry) allEntries.nextElement();
                     String name = entry.getName();
-                    if ((name.endsWith(".class")) && !(name.endsWith("IntPlugin.class"))) {
+                    if ( (name.endsWith(".class")) && !(name.endsWith("IntPlugin.class"))
+                        && !(name.matches("(.*)\\$(.*)")) ) {
                         name = name.replace(".class", "");
                         name = name.replace("/", ".");
+                        System.out.println(name);
                         Class plugin = classLoader.loadClass(name);
                         //run construct
                         plugins.add((IntPlugin) plugin.newInstance());

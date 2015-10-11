@@ -3,9 +3,11 @@
 Project for work with network resources.
 
                    ---Build and run---
-For run you must "gradle build" from folders "./plugins/*/".
-Copy "*.jar" files from "./plugins/*/./build/libs" into folder "./plugins"
-For run you must "gradle build" or "gradle run" from folders "./".
+Linux:
+For run you must run in console from main folder "./gradlew run".
+
+Windows:
+For run you must run in console from main folder "gradlew run".
 
                       ---About---
 You can see main project "Network-Organizer" and two plugins for him.

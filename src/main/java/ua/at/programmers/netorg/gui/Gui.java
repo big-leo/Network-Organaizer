@@ -110,6 +110,7 @@ public class Gui extends JFrame implements ActionListener, Runnable {
         txtScript = new JTextArea(10, 30);
         txtScript.setMargin(new Insets(5, 5, 5, 5));
         txtScript.setEditable(true);
+        txtScript.setTabSize(2);
         btnRun = new JButton("Run Script");
         btnRun.setActionCommand("RunScript");
         btnRun.addActionListener(this);

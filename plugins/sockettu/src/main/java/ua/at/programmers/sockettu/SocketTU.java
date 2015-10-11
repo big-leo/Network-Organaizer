@@ -18,15 +18,6 @@ import ua.at.programmers.netorg.interfaces.IntPlugin;
 
 public class SocketTU implements ActionListener, IntPlugin {
     private String name = "Scan port";
-    private static int nextId = 0;
-    private int id;
-    private SocketAddress sockaddr;
-    private Socket socket;
-    private boolean isOpen;
-    private String error;
-    private String sUrl;
-    private int port;
-    private static boolean withEcho = true;
     private Panel panelScan;
     private JLabel prm1;
     private JLabel prm2;
@@ -34,8 +25,7 @@ public class SocketTU implements ActionListener, IntPlugin {
     private JTextField txtFldPrm2;
     private JButton btnScan;
     private JTextArea txtLog;
-    private InputStream is;
-    private OutputStream os;
+    private static boolean withEcho = true;
 
     @Override
     public void run() {
@@ -67,51 +57,6 @@ public class SocketTU implements ActionListener, IntPlugin {
         this.txtLog = txtLog;
     }
 
-    private void open() throws IOException {
-        try {
-            if ((socket == null) || (socket.isClosed())) {
-                socket = new Socket();
-                sockaddr = new InetSocketAddress(sUrl, port);
-                socket.connect(sockaddr, 1000);
-                if ((socket.isConnected()) && (socket.isClosed() == false)) {
-                    isOpen = true;
-                }
-            }
-            if (isOpen)
-                this.msg("open " + sUrl + " " + port );
-        } catch (SocketTimeoutException toe) {
-            //System.out.println(toe);
-            error = "Timeout";
-        }
-        catch (ConnectException ce) {
-            //System.out.println(ce);
-            error = "port is closing";
-        }
-        if ((withEcho) && (error != null) && (error.length() != 0)) {
-            this.msg(error);
-            error = null;
-        }
-    }
-
-    private void close() throws IOException {
-        if ((socket != null) && !(socket.isClosed())){
-            try {
-                socket.close();
-                if (socket.isClosed())
-                    isOpen = false;
-            } catch (SocketTimeoutException toe) {
-                error = "Timeout";
-            }
-            catch (ConnectException ce) {
-                System.out.println(ce);
-                error = "port is closing";
-            }
-            if ((withEcho) && (error != null) && (error.length() != 0))
-                this.msg(error);
-        }
-        //System.out.println((isOpen) ? "open" : "close");
-    }
-
     private void msg(String msg) {
         if (txtLog == null) {
             System.out.println(msg);
@@ -125,42 +70,54 @@ public class SocketTU implements ActionListener, IntPlugin {
     public void actionPerformed(ActionEvent event) {
         if ("scan".equals(event.getActionCommand())) {
             String prm1, prm2;
+            boolean fromForm = true;
             prm1 = txtFldPrm1.getText();
             prm2 = txtFldPrm2.getText();
-            this.scan(prm1, prm2);
+            this.scan(prm1, prm2, fromForm);
         }
     }
 
-    public void shell_scan(String prm1, String prm2) {
-        this.scan(prm1, prm2);
+    public boolean shell_scan(String prm1, String prm2) {
+        boolean fromForm = false;
+        return this.scan(prm1, prm2, fromForm);
     }
 
-    private void scan(String prm1, String prm2) {
+    private boolean scan(String prm1, String prm2, boolean fromForm) {
+        boolean result = false;
         int intPrm2 = 0;
         try {
             intPrm2 = Integer.parseInt(prm2);
         } catch (NumberFormatException nfe) {}
         try {
-
             if (intPrm2 > 0) {
-                SocketTU.setEcho(true);
-                this.sUrl = prm1;
-                this.port = intPrm2;
-                this.open();
-                this.close();
+                if (fromForm) {
+                    SocketTU.setEcho(true);
+                }
+                else {
+                    SocketTU.setEcho(false);
+                }
+                Scaner scaner = new Scaner();
+                Thread t = new Thread(scaner);
+                t.start();
+                result = scaner.open(prm1, intPrm2);
+                scaner.close();
             }
             else {
                 SocketTU.setEcho(false);
                 for (int i = 0; i < 1000; i++) {
-                    this.sUrl = prm1;
-                    this.port = i;
-                    this.open();
-                    this.close();
+                    Scaner scaner = new Scaner();
+                    Thread t = new Thread(scaner);
+                    t.start();
+                    while (t == null)
+                        System.out.println("wait for start Scaner");
+                    result = scaner.open(prm1, i);
+                    scaner.close();
                 }
             }
         } catch (IOException ioe) {
             //System.out.println(ioe);
         }
+        return result;
     }
 
     private void create_gui_items() {
@@ -172,5 +129,70 @@ public class SocketTU implements ActionListener, IntPlugin {
         btnScan = new JButton("scan");
         btnScan.setActionCommand("scan");
         btnScan.addActionListener(this);
+    }
+
+    private class Scaner implements Runnable {
+
+        private SocketAddress sockaddr;
+        private Socket socket;
+        private boolean isOpen;
+        private String error;
+        private String sUrl;
+        private int port;
+
+        @Override
+        public void run() {
+        }
+
+        private boolean open(String sUrl, int port) throws IOException {
+            boolean result = false;
+            this.sUrl = sUrl;
+            this.port = port;
+            try {
+                if ((socket == null) || (socket.isClosed())) {
+                    socket = new Socket();
+                    sockaddr = new InetSocketAddress(sUrl, port);
+                    socket.connect(sockaddr, 1000);
+                    if ((socket.isConnected()) && (socket.isClosed() == false)) {
+                        isOpen = true;
+                    }
+                }
+                if (isOpen) {
+                    msg("open " + sUrl + " " + port );
+                    result = true;
+                }
+            } catch (SocketTimeoutException toe) {
+                //System.out.println(toe);
+                error = "Timeout";
+            }
+            catch (ConnectException ce) {
+                //System.out.println(ce);
+                error = "port is closing";
+            }
+            if ((withEcho) && (error != null) && (error.length() != 0)) {
+                msg(error);
+                error = null;
+            }
+            return result;
+        }
+
+        private void close() throws IOException {
+            if ((socket != null) && !(socket.isClosed())){
+                try {
+                    socket.close();
+                    if (socket.isClosed())
+                        isOpen = false;
+                } catch (SocketTimeoutException toe) {
+                    error = "Timeout";
+                }
+                catch (ConnectException ce) {
+                    System.out.println(ce);
+                    error = "port is closing";
+                }
+                if ((withEcho) && (error != null) && (error.length() != 0))
+                    msg(error);
+            }
+            //System.out.println((isOpen) ? "open" : "close");
+        }
     }
 }
